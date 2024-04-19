@@ -16,7 +16,7 @@ class Blurb
     def list(params = {})
       execute_request(
         request_type: :get,
-        url_params: list_params(**params)
+        url_params: list_params(params)
       )
     end
 

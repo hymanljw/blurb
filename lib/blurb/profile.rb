@@ -16,9 +16,16 @@ require 'blurb/budget_rules_recommendation_requests'
 require 'blurb/sp_v3_request_collection'
 require 'blurb/amazon_marketing_stream'
 require 'blurb/bid_recommendation_v3_requests'
+require 'blurb/sb_v4_request_collection'
+require 'blurb/sb_v3_request_collection'
+
+require 'blurb/concerns/sb_requests'
+
 
 class Blurb
   class Profile < BaseClass
+    include SbRequests
+
     attr_accessor(
       :account,
       :ad_groups,

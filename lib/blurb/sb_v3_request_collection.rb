@@ -2,25 +2,20 @@ require 'blurb/request'
 require 'blurb/base_class'
 
 class Blurb
-  class SpV3RequestCollection < BaseClass
+  class SbV3RequestCollection < BaseClass
     attr_accessor :api_limit
-    attr_reader :base_url, :resource_type, :resource_key, :headers
+    attr_reader :base_url, :resource_type, :resource_key, :headers, :api_path
 
-    def initialize(headers:, resource_type:, base_url: nil, bulk_api_limit: 1000)
+    def initialize(headers:, resource_type:, base_url: nil, bulk_api_limit: 10)
       @base_url = base_url
       @resource_type = resource_type.to_s
       @resource_key = camel_resource_key(@resource_type)
-      _content_type = "application/vnd.sp#{@resource_key}.v3+json"
-      @headers = headers.merge("Content-Type": _content_type, "Accept": _content_type)
+      @headers = headers
       @api_limit = bulk_api_limit
     end
 
     def camel_resource_key(resource_type)
-      {
-        "target" => "targetingClause",
-        "negative_target" => "negativeTargetingClause",
-        "campaign_negative_target" => "campaignNegativeTargetingClause"
-      }.fetch(resource_type, resource_type).singularize.camelcase(:lower)
+      resource_type.singularize.camelcase(:lower)
     end
 
     def snake_resource_key(plural = true)
@@ -28,6 +23,7 @@ class Blurb
     end
 
     def list(params = {})
+      return list_array(params.presence) if @resource_type.to_s.in?(["keyword", "negative_keyword"])
       execute_request(
         api_path: "/list",
         request_type: :post,
@@ -40,7 +36,7 @@ class Blurb
       _list_params_[:maxResults] = params[:size].to_i if params[:size].present?
       _list_params_[:nextToken] = params[:next_token] if params[:next_token].present?
       _list_params_[:stateFilter] = {include: Array(params[:state_filter]).map(&:upcase)} if params[:state_filter].present?
-      _list_params_[:includeExtendedDataFields] = params[:extend] != false
+      # _list_params_[:includeExtendedDataFields] = params[:extend] != false
 
       _list_params_[:portfolioIdFilter] = {include: Array(params[:portfolio_id_filter]).map(&:to_s)} if params[:portfolio_id_filter].present?
       _list_params_[:campaignIdFilter] = {include: Array(params[:campaign_id_filter]).map(&:to_s)} if params[:campaign_id_filter].present?
@@ -62,8 +58,13 @@ class Blurb
       _list_params_[:negativeKeywordTextFilter] = { queryTermMatchType: params[:term_type] || "BROAD_MATCH", include: Array(params[:ng_kw_filter]) } if params[:ng_kw_filter].present?
       _list_params_[:campaignNegativeKeywordTextFilter] = { queryTermMatchType: params[:term_type] || "BROAD_MATCH", include: Array(params[:campagin_ng_kw_filter]) } if params[:campagin_ng_kw_filter].present?
       _list_params_[:asinFilter] = { queryTermMatchType: params[:term_type] || "BROAD_MATCH", include: Array(params[:asin_filter]) } if params[:asin_filter].present?
-
+      _list_params_[:goalTypeFilter] = params[:goal_type_filter] if params[:goal_type_filter].present?
       _list_params_
+    end
+
+    # Get Keywords and Negative keywords list by this method
+    def list_array(url_params = nil)
+      execute_request(request_type: :get, url_params: )
     end
 
     def retrieve(resource_id)
@@ -103,17 +104,19 @@ class Blurb
       results.flatten
     end
 
-    private
-      def execute_request(request_type:, api_path: '', payload: nil, url_params: nil)
-        url = "#{@base_url}#{api_path}"
-        request = Request.new(
-          url:,
-          url_params:,
-          request_type:,
-          payload: ,
-          headers: @headers
-        )
+    # send a request in api_path
+    def launch_request(api_path, request_type, **params)
+      @api_path = api_path
+      execute_request(request_type: , **params.slice(:payload, :url_params))
+    end
 
+    private
+      def execute_request(request_type: , api_path: nil, payload: nil, url_params: nil, headers: {})
+        url = "#{@base_url}#{api_path || @api_path}"
+        request = Request.new(
+          url: , url_params: , request_type: , payload: ,
+          headers: @headers.merge(headers)
+        )
         request.make_request
       end
 
