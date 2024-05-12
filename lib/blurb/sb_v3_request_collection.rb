@@ -32,33 +32,16 @@ class Blurb
     end
 
     def list_params(params = {})
-      _list_params_ = {}
+      _list_params_ = params.except(:size, :state_filter)
       _list_params_[:maxResults] = params[:size].to_i if params[:size].present?
-      _list_params_[:nextToken] = params[:next_token] if params[:next_token].present?
-      _list_params_[:stateFilter] = {include: Array(params[:state_filter]).map(&:upcase)} if params[:state_filter].present?
-      # _list_params_[:includeExtendedDataFields] = params[:extend] != false
+      _list_params_[:state_filter] = {include: Array(params[:state_filter])} if params[:state_filter].present?
 
-      _list_params_[:portfolioIdFilter] = {include: Array(params[:portfolio_id_filter]).map(&:to_s)} if params[:portfolio_id_filter].present?
-      _list_params_[:campaignIdFilter] = {include: Array(params[:campaign_id_filter]).map(&:to_s)} if params[:campaign_id_filter].present?
-      _list_params_[:adGroupIdFilter] = {include: Array(params[:ad_group_id_filter]).map(&:to_s)} if params[:ad_group_id_filter].present?
-      _list_params_[:keywordIdFilter] = {include: Array(params[:keyword_id_filter]).map(&:to_s)} if params[:keyword_id_filter].present?
-      _list_params_[:targetIdFilter] = {include: Array(params[:target_id_filter]).map(&:to_s)} if params[:target_id_filter].present?
-      _list_params_[:adIdFilter] = {include: Array(params[:ad_id_filter]).map(&:to_s)} if params[:ad_id_filter].present?
-      _list_params_[:negativeKeywordIdFilter] = {include: Array(params[:ng_keyword_id_filter]).map(&:to_s)} if params[:ng_keyword_id_filter].present?
-      _list_params_[:negativeTargetIdFilter] = {include: Array(params[:ng_target_id_filter]).map(&:to_s)} if params[:ng_target_id_filter].present?
-      _list_params_[:campaignNegativeKeywordIdFilter] = {include: Array(params[:campaign_ng_keyword_id_filter]).map(&:to_s)} if params[:campaign_ng_keyword_id_filter].present?
-      _list_params_[:campaignNegativeTargetIdFilter] = {include: Array(params[:campaign_ng_target_id_filter]).map(&:to_s)} if params[:campaign_ng_target_id_filter].present?
-      _list_params_[:campaignTargetingTypeFilter] = params[:targeting_type_filter] if params[:targeting_type_filter].present?
-
-      _list_params_[:locale] = params[:locale] if params[:locale].present?
-      _list_params_[:matchTypeFilter] = Array(params[:match_type_filter]) if params[:match_type_filter].present?
-      _list_params_[:expressionTypeFilter] = {include: Array(params[:exp_type_filter])} if params[:exp_type_filter].present?
-      _list_params_[:nameFilter] = { queryTermMatchType: params[:term_type] || "BROAD_MATCH", include: Array(params[:name_filter]) } if params[:name_filter].present?
-      _list_params_[:keywordTextFilter] = { queryTermMatchType: params[:term_type] || "BROAD_MATCH", include: Array(params[:kw_filter]) } if params[:kw_filter].present?
-      _list_params_[:negativeKeywordTextFilter] = { queryTermMatchType: params[:term_type] || "BROAD_MATCH", include: Array(params[:ng_kw_filter]) } if params[:ng_kw_filter].present?
-      _list_params_[:campaignNegativeKeywordTextFilter] = { queryTermMatchType: params[:term_type] || "BROAD_MATCH", include: Array(params[:campagin_ng_kw_filter]) } if params[:campagin_ng_kw_filter].present?
-      _list_params_[:asinFilter] = { queryTermMatchType: params[:term_type] || "BROAD_MATCH", include: Array(params[:asin_filter]) } if params[:asin_filter].present?
-      _list_params_[:goalTypeFilter] = params[:goal_type_filter] if params[:goal_type_filter].present?
+      %w[portfolio_id campaign_id ad_group_id keyword_id target_id ad_id ng_keyword_id
+        ng_target_id campaign_ng_keyword_id campaign_ng_target_id].each do |id_key|
+        full_key = id_key.gsub(/ng_/, "negative_")
+        filter_value = params[:"#{id_key}_filter"] || params[:"#{full_key}_filter"]
+        _list_params_[:"#{full_key}_filter"] = {include: Array(filter_value).map(&:to_s)} if filter_value.present?
+      end
       _list_params_
     end
 

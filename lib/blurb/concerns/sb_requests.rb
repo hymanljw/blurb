@@ -259,8 +259,6 @@ module SbRequests
     @sb_recommended_bids.launch_request(nil, :post, payload: )
   end
 
-  "/sb/campaigns/budgetRules/recommendations"
-
   # Gets a list of special events with suggested date range and suggested budget increase for a campaign specified by identifier.
   def sb_recommend_budget_rules(campaign_id)
     @sb_recommended_budget_rules ||= Blurb::SbV3RequestCollection.new(
@@ -283,7 +281,7 @@ module SbRequests
     @sb_stores ||= Blurb::SbV3RequestCollection.new(
       headers: headers_hash,
       resource_type: :store_asset,
-      base_url: "#{account.api_url}/sb/recommendations/keyword")
+      base_url: "#{account.api_url}/stores/assets")
   end
 
   # Gets a list of assets associated with a specified brand entity identifier.
@@ -319,7 +317,7 @@ module SbRequests
   end
 
   # getBrands
-  def sb_get_brands(brand_type_filter)
+  def sb_get_brands(brand_type_filter=nil)
     @sb_brands ||= Blurb::SbV3RequestCollection.new(
       headers: headers_hash,
       resource_type: :brand,

@@ -7,5 +7,13 @@ class Blurb
       sb: "sb",
       sd: "sd"
     }.freeze
+
+    CAMPAIGN_TYPES = {
+      "sp" => "SPONSORED_PRODUCTS",
+      "sb" => "SPONSORED_BRANDS",
+      "sd" => "SPONSORED_DISPLAY",
+      "st" => "SPONSORED_TELEVISION",
+      "dsp" => "DEMAND_SIDE_PLATFORM"
+    }
   end
 end

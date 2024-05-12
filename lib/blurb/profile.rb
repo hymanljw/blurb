@@ -18,6 +18,7 @@ require 'blurb/amazon_marketing_stream'
 require 'blurb/bid_recommendation_v3_requests'
 require 'blurb/sb_v4_request_collection'
 require 'blurb/sb_v3_request_collection'
+require 'blurb/export_requests'
 
 require 'blurb/concerns/sb_requests'
 
@@ -156,12 +157,6 @@ class Blurb
         resource: 'negativeKeywords',
         campaign_type: CAMPAIGN_TYPE_CODES[:sb]
       )
-      @sb_negative_targets = RequestCollectionWithCampaignType.new(
-        headers: headers_hash,
-        base_url: account.api_url,
-        resource: 'negativeTargets',
-        campaign_type: CAMPAIGN_TYPE_CODES[:sb]
-      )
       @campaign_negative_keywords = RequestCollection.new(
         headers: headers_hash,
         base_url: "#{account.api_url}/v2/sp/campaignNegativeKeywords"
@@ -206,7 +201,6 @@ class Blurb
         base_url: account.api_url,
         campaign_type: CAMPAIGN_TYPE_CODES[:sp]
       )
-
       @sp_campaigns_v3 = SpV3RequestCollection.new(
         headers: headers_hash,
         resource_type: :campaign,
@@ -276,8 +270,7 @@ class Blurb
     end
 
     def negative_targets(campaign_type)
-      return @sp_negative_targets_v3 if campaign_type == :sp
-      return @sb_negative_targets if %i[sb hsa].include?(campaign_type)
+      @sp_negative_targets_v3 if campaign_type == :sp
     end
 
     def snapshots(campaign_type)
@@ -290,6 +283,17 @@ class Blurb
       return @sp_reports if campaign_type == :sp
       return @sb_reports if %i[sb hsa].include?(campaign_type)
       return @sd_reports if campaign_type == :sd
+    end
+
+    def reports_v3(campaign_type)
+      var_name = :"@#{campaign_type}_reports_v3"
+      instance_variable_get(var_name) or
+        instance_variable_set(
+          var_name,
+          ReportV3Requests.new(
+            headers: headers_hash,
+            base_url: account.api_url,
+            campaign_type: campaign_type.to_s))
     end
 
     def bid_recommendations(campaign_type)
@@ -348,6 +352,12 @@ class Blurb
         headers: headers_hash,
         base_url: account.api_url
       )
+    end
+
+    def exports(record_type)
+      @exports ||= ExportRequests.new(headers: headers_hash, base_url: account.api_url)
+      @exports.record_type = record_type
+      @exports
     end
   end
 end
