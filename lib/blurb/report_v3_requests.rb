@@ -77,8 +77,9 @@ class Blurb
                *CONVERSION_COLUMNS,
                *PURCHASES_COLUMNS,
                "spend", "campaignBiddingStrategy"].tap do |arr|
-                [*CAMPAING_COLUMNS, *%w[campaignRuleBasedBudgetAmount campaignApplicableBudgetRuleId campaignApplicableBudgetRuleName topOfSearchImpressionShare]
+                [*CAMPAING_COLUMNS, *%w[campaignRuleBasedBudgetAmount campaignApplicableBudgetRuleId campaignApplicableBudgetRuleName]
                 ].each {|i| arr << i } if group_by.map(&:to_s).include?("campaign")
+                arr << "topOfSearchImpressionShare" if group_by == ["campaign"]
                 %w[ adGroupName adGroupId adStatus ].each {|i| arr << i } if group_by.map(&:to_s).include?("adGroup")
                 arr << "placementClassification" if group_by.map(&:to_s).include?("campaignPlacement")
               end
