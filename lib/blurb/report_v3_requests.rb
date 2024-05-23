@@ -77,7 +77,7 @@ class Blurb
                *CONVERSION_COLUMNS,
                *PURCHASES_COLUMNS,
                "spend", "campaignBiddingStrategy"].tap do |arr|
-                [*CAMPAING_COLUMNS, *%w[campaignRuleBasedBudgetAmount campaignApplicableBudgetRuleId campaignApplicableBudgetRuleName]
+                [*CAMPAING_COLUMNS, *%w[campaignRuleBasedBudgetAmount campaignApplicableBudgetRuleId campaignApplicableBudgetRuleName topOfSearchImpressionShare]
                 ].each {|i| arr << i } if group_by.map(&:to_s).include?("campaign")
                 %w[ adGroupName adGroupId adStatus ].each {|i| arr << i } if group_by.map(&:to_s).include?("adGroup")
                 arr << "placementClassification" if group_by.map(&:to_s).include?("campaignPlacement")
@@ -90,7 +90,7 @@ class Blurb
                 *CAMPAING_COLUMNS,
                 "portfolioId", "salesOtherSku7d", "unitsSoldOtherSku7d",
                 "acosClicks7d", "acosClicks14d", "roasClicks7d", "roasClicks14d", "keywordId", "keyword", "keywordBid",
-                "adGroupName", "adGroupId", "keywordType", "matchType", "targeting", "adKeywordStatus"
+                "adGroupName", "adGroupId", "keywordType", "matchType", "targeting", "adKeywordStatus", "topOfSearchImpressionShare"
               ]
             when :spSearchTerm
               [
