@@ -7,7 +7,7 @@ class Blurb
     def initialize(campaign_type:, base_url:, headers:)
       @campaign_type = campaign_type
       @base_url = "#{base_url}/#{@campaign_type}"
-      @headers = headers
+      @headers = headers.merge("Content-Type" => "application/vnd.spthemebasedbidrecommendation.v4+json")
     end
 
     def list(payload)
