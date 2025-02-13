@@ -13,13 +13,13 @@ class Blurb
     end
 
     # record_type => [:campagin, :ad_group, :ad, :target]
-    def create(state_filter = nil, ad_product_filter = nil)
+    def create(state_filter = nil, ad_product_filter = nil, **params)
       # state_filter default => ["ENABLED", "PAUSED","ARCHIVED"],
       # ad_product_filter default => ["SPONSORED_PRODUCTS","SPONSORED_BRANDS","SPONSORED_DISPLAY"]
       execute_request(
         api_path: "/#{@record_type.to_s.pluralize.camelize(:lower)}/export",
         request_type: :post,
-        payload: { state_filter: , ad_product_filter: }.compact,
+        payload: { state_filter: , ad_product_filter: , **params.slice(:target_type_filter, :target_level_filter, :negative_filter)}.compact,
         headers: @headers.merge(record_type_headers)
       )
     end
