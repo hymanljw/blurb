@@ -165,9 +165,14 @@ class Blurb
         headers: headers_hash,
         base_url: "#{account.api_url}/v2/sp/targets"
       )
-      @portfolios = RequestCollection.new(
+      # @portfolios = RequestCollection.new(
+      #   headers: headers_hash,
+      #   base_url: "#{account.api_url}/v2/portfolios"
+      # )
+      @portfolios = SpV3RequestCollection.new(
         headers: headers_hash,
-        base_url: "#{account.api_url}/v2/portfolios"
+        resource_type: :portfolio,
+        base_url: "#{account.api_url}/portfolios"
       )
       @suggested_keywords = SuggestedKeywordRequests.new(
         headers: headers_hash,
